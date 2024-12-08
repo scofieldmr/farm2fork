@@ -35,14 +35,15 @@ public class CustomerController {
     WishlistService wishlistService;
 
 
-    //To Register the Customer
+
+
+
     @PostMapping("/registerCustomer")
     public void addCustomer(@RequestBody Customer customer) {
     	System.out.println(customer);
         customerService.addCustomerService(customer);
     }
 
-    // To update the customer details
     @PutMapping("/updateCustomer")
         public void updateCustomer(@RequestParam Long customerId, @RequestBody Customer customer){
          customerService.updateCustomerDetails(customerId, customer);
