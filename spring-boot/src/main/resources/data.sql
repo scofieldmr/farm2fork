@@ -1,0 +1,2 @@
+INSERT INTO admin(admin_id, admin_name, email, password, address, contact_number, email_domain, active_user)
+VALUES(1, 'walter', 'admin@farm2fork.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'Chennai', 9876543210, 'farm2fork.com', 'yes');
