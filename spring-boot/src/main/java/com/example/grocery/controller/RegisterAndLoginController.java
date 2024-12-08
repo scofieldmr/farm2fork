@@ -18,6 +18,7 @@ public class RegisterAndLoginController {
     CredentialsService credentialsService;
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody LoginDto loginUser) {
+        //Logging in functionality
         System.out.println(loginUser);
         return credentialsService.authenticate(loginUser.getEmail(), loginUser.getPassword());
     }
