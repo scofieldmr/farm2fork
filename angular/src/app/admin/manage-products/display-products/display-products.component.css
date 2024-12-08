@@ -1,0 +1,136 @@
+.display-products {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.display-products h1 {
+    color: #388e3c;
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.products-table th {
+    background-color: #388e3c;
+    color: white;
+    padding: 12px 15px;
+    .display-products {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .display-products h1 {
+        color: #2ecc71;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        text-align: center;
+    }
+    
+    .products-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .products-table thead {
+        background-color: #2ecc71;
+        color: white;
+    }
+    
+    .products-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 500;
+    }
+    
+    .products-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .products-table tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+    
+    .products-table input[type="button"] {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .products-table input[type="button"]:hover {
+        background-color: #c0392b;
+    }
+    
+    /* Responsive Design */
+    @media screen and (max-width: 768px) {
+        .display-products {
+            padding: 1rem;
+        }
+    
+        .products-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    
+        .products-table th,
+        .products-table td {
+            padding: 0.8rem;
+        }
+    }
+    text-align: left;
+    font-weight: 500;
+}
+
+.products-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.products-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.products-table input[type="button"] {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.products-table input[type="button"]:hover {
+    background-color: #c82333;
+}
+
+@media (max-width: 768px) {
+    .products-table {
+        font-size: 14px;
+    }
+    
+    .products-table th,
+    .products-table td {
+        padding: 8px;
+    }
+}

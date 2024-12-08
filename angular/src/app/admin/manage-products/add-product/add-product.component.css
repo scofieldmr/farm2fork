@@ -1,0 +1,112 @@
+.add-product {
+    max-width: 600px;
+    margin: 1rem auto; 
+    padding: 0 1rem;
+    height: auto; 
+    min-height: 80vh; 
+    overflow-y: auto; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+}
+
+.add-product h1 {
+    color: #388e3c;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+.add-form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    flex-grow: 1;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.message {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.form-group {
+    margin-bottom: 1.5rem; 
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input[type="text"], 
+.form-group input[type="number"] {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input[type="text"]:focus, 
+.form-group input[type="number"]:focus {
+    border-color: #388e3c;
+    outline: none;
+}
+
+.form-group input[type="submit"] {
+    background-color: #388e3c;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.form-group input[type="submit"]:hover {
+    background-color: #27ae60;
+}
+
+body {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    .add-product {
+        margin: 1rem auto;
+        min-height: 70vh; 
+    }
+
+    .add-form {
+        padding: 1.2rem; 
+    }
+}

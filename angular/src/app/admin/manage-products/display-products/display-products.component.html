@@ -1,0 +1,23 @@
+<div class="display-products">
+    <h1>Display Product</h1>
+    <table class="products-table">
+        <thead>
+            <tr>
+                <th>Product Id</th>
+                <th>Product Name</th>
+                <th>Product Category</th>
+                <th>Product Quantity</th>
+                <th>Product Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let prod of prodList1">
+                <td>{{prod.productId}}</td>
+                <td>{{prod.productName | uppercase}}</td>
+                <td>{{prod.productCategory | uppercase}}</td>
+                <td>{{prod.quantity}}</td>
+                <td>{{prod.price | currency:'INR'}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

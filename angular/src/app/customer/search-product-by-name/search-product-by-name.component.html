@@ -1,0 +1,26 @@
+<div class="search-container">
+  <h2>Search Product</h2>
+  <form (submit)="onSearch()">
+    <input 
+      type="text" 
+      [(ngModel)]="searchName" 
+      name="name" 
+      placeholder="Enter product name" 
+      required 
+    />
+    <button type="submit">Search</button>
+  </form>
+
+  <div *ngIf="message" class="message">{{ message }}</div>
+
+  <div *ngIf="products != null">
+    <h3>Search Results:</h3>
+    <div class="product-card">
+      <p><strong>Product ID:</strong> {{ products.productId }}</p>
+      <p><strong>Name:</strong> {{ products.productName }}</p>
+      <p><strong>Price:</strong> ₹{{ products.price }}</p>
+      <p><strong>Quantity:</strong> {{ products.quantity }}</p>
+      <p><strong>Category:</strong> {{ products.productCategory }}</p>
+    </div>
+  </div>
+</div>

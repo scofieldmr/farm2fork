@@ -1,0 +1,51 @@
+<div class="cart-container">
+  <div class="product-grid">
+    <div *ngFor="let product of customerCart; let i = index" class="product-card">
+      <h3>{{ product.productName }}</h3>
+      <p>Product ID: {{ product.productId }}</p>
+      <p>
+        Quantity: </p>
+        <div class="quantity-control">
+          <button (click)="decrementQuantity(i)" class="quantity-btn">-</button>
+          <input type="number" [(ngModel)]="product.quantity" min="1" (change)="updateTotalPrice(i)" class="quantity-input"/>
+          <button (click)="incrementQuantity(i)" class="quantity-btn">+</button>
+        </div>     
+      <p>Price per Unit: ₹{{ product.price }}</p>
+      <p>Total Price: ₹{{ product.totalPrice }}</p>
+      <button (click)="removeFromCart(i)" class="remove-btn">Remove from Cart</button>
+    </div>
+  </div>
+  <div *ngIf="hasProductsInCart(); else browse">
+    <button (click) = "pay()"  class="pay-button">Pay</button>
+  </div>
+  <ng-template #browse>
+    <div>
+      <h1>Your Cart is Empty!!!</h1>
+    </div>
+  </ng-template>
+
+  <div *ngIf="showGeneratePopup" class="popup">
+    Generating Bill....
+  </div>
+  
+  
+  <div class="modal" *ngIf="showBillPopup">
+    <div class="modal-content">
+      <span class="close-button" (click)="showBillPopup = false">&times;</span>
+      <h2>Bill Summary</h2>
+      <div *ngFor="let product of customerCart">
+        <p><strong>{{ product.productName }}</strong></p>
+        <p>Quantity: {{ product.quantity }}</p>
+        <p>Price per Unit: ₹{{ product.price }}</p>
+        <p>Total: ₹{{ product.totalPrice }}</p>
+        <hr />
+      </div>
+      <h3>Total Amount: ₹{{ getTotalAmount() }}</h3>
+      <button (click)="confirmPurchase()" class="confirm-button">Confirm</button>
+      
+    </div>
+  </div>
+  
+</div>
+
+

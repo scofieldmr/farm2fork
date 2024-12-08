@@ -1,0 +1,25 @@
+
+
+<div align="center" style="width: 50%;">
+    <h1>Delete Product</h1>
+    <form #deleteProductForm="ngForm" (submit)="deleteProduct(deleteProductForm.value.prodId)">
+      <div>
+        <label>Product ID</label>
+        <input type="text" name="prodId" ngModel required #prodId="ngModel">
+        <div *ngIf="prodId.invalid && prodId.touched" style="color: red;">
+          Product ID is required.
+        </div>
+      </div>
+      <div>
+        <input type="submit" value="Delete Product" [disabled]="deleteProductForm.invalid">
+      </div>
+    </form>
+  
+    <div *ngIf="successMessage" class="message success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="message error">
+      {{ errorMessage }}
+    </div>
+  </div>
+  

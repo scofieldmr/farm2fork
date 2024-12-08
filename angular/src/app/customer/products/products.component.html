@@ -1,0 +1,56 @@
+<div class="filter-bar">
+  <div class="sort-options">
+    <label>
+      <input type="radio" name="priceSort" value="asc" (change)="sortProducts('asc')" />
+      Price: Low to High
+    </label>
+    <label>
+      <input type="radio" name="priceSort" value="desc" (change)="sortProducts('desc')" />
+      Price: High to Low
+    </label>
+    <button type="submit" class="btn btn-primary btn-reset" (click)="resetFilter()">Reset</button>
+  </div>
+
+    <select class = "category-search"[(ngModel)]="selectedCategory" name="category" id="category" (change)="filterByCategory()">
+      <option value="">Filter by category</option>
+      <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+    </select>
+
+
+  
+</div>
+
+<div class="product-grid">
+  <div *ngFor="let product of products" class="product-card">
+    <h3>{{ product.productName }}</h3>
+    <p>Id: {{product.productId}}</p>
+    <p>Category: {{ product.productCategory }}</p>
+    <p>Price: {{ product.price }}</p>
+    <p>Available Quantity: {{ product.quantity }}</p>
+
+    <label>
+      Quantity:
+      <input type="number" name="quantity" [(ngModel)]="product.selectedQuantity" min="1" [max]="product.quantity" #quantity="ngModel"/>
+    </label>
+
+    <div *ngIf="product.selectedQuantity > product.quantity" class="error-message">
+      Quantity cannot exceed available stock.
+    </div>
+
+    <button (click)="addToCart(product)" [disabled]="product.selectedQuantity > product.quantity || product.selectedQuantity < 1
+    ">
+      Add to Cart
+    </button>
+
+    <button (click)="addToWishlist(product)">
+      Add to Wishlist
+    </button>
+  </div>
+</div>
+
+<div *ngIf="isModalVisible" class="modal-overlay">
+  <div class="modal-content">
+    <p>{{ message }}</p>
+    <button (click)="closeModal()">Close</button>
+  </div>
+</div>  

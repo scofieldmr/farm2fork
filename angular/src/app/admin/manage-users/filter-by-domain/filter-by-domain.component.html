@@ -1,0 +1,38 @@
+<body>
+    <div class="wrapper">
+        <form (submit)="onDomainSelect()">
+          <label for="category">Choose a domain:</label>
+          <select [(ngModel)]="selectedDomain" name="domain" id="domain">
+            <option value="">Select a domain</option>
+            <option *ngFor="let domain of domains" [value]="domain">{{ domain }}</option>
+          </select>
+          <button type="submit">Submit</button>
+        </form>
+      
+        <table *ngIf="customers && customers.length">
+          <thead>
+            <tr>
+              <th>Customer ID</th>
+              <th>Customer Name</th>
+              <th>Email</th>
+              <th>Address</th>
+              <th>Contact Number</th>
+              <th>Email Domain</th>
+              <th>Active User</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let customer of customers">
+              <td>{{ customer.customerId }}</td>
+              <td>{{ customer.customerName }}</td>
+              <td>{{ customer.email }}</td>
+              <td>{{ customer.address }}</td>
+              <td>{{ customer.contactNumber }}</td>
+              <td>{{ customer.emailDomain }}</td>
+              <td>{{ customer.activeUser }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </body>  
+    

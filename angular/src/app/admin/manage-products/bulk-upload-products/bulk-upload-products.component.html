@@ -1,0 +1,39 @@
+<h2>Upload Product CSV</h2>
+  <input type="file" (change)="onFileSelect($event)">
+  <div *ngIf="message">{{ message }}</div>
+  <div *ngIf="isParsed">
+  <h3>Parsed Products</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products; let i = index">
+        <td>{{ product.productName }}</td>
+        <td>{{ product.productCategory }}</td>
+        <td>{{ product.quantity }}</td>
+        <td>{{ product.price }}</td>
+        <td>
+          <button (click)="cancelProduct(i)">Cancel</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button (click)="addAllProducts()">Add All</button>
+  </div>
+  
+  <div *ngIf="successMessage; else error"><h2 id="success-message">{{ successMessage }}</h2></div>
+  
+  <ng-template #error>
+    <div class="message"><h2 id="error-message">{{errorMessage}}</h2></div>
+  </ng-template>
+  
+     
+     
+  

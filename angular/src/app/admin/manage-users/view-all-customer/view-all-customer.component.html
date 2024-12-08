@@ -1,0 +1,31 @@
+<div class="container">
+    <h2>Fetch Customer Details</h2>
+    <button (click)="loadCustomerDetails()" class="fetch-button">Fetch All Customers</button>
+  
+    <table *ngIf="customers.length > 0" class="customer-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Address</th>
+          <th>Contact Number</th>
+          <th>Active User</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let customer of customers">
+          <td>{{ customer.customerName }}</td>
+          <td>{{ customer.email }}</td>
+          <td>{{ customer.address }}</td>
+          <td>{{ customer.contactNumber }}</td>
+          <td>{{ customer.activeUser }}</td>
+        </tr>
+      </tbody>
+    </table>
+  
+    <div *ngIf="customers.length === 0 && isFetched" class="no-data">
+      No customer details found.
+    </div>
+  </div>
+  
+  

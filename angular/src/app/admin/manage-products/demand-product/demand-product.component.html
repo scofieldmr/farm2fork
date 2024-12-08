@@ -1,0 +1,15 @@
+<div class="product-details-container">
+    <h1>Product Details</h1>
+    <div class="product-card-container">
+      <div class="product-card" *ngFor="let product of products">
+        <div class="product-info">
+          <h2>{{ product.productName }}</h2>
+          <p><strong>Product ID:</strong> {{ product.productId }}</p>
+          <p><strong>Category:</strong> {{ product.productCategory }}</p>
+          <p><strong>Wishlist Count:</strong> {{ product.wishlistCount }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  

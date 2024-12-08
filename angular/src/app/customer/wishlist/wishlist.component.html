@@ -1,0 +1,30 @@
+<div class="wishlist-container">
+    <div class="product-grid">
+      <div *ngFor="let item of wishlist; let i = index" class="product-card">
+        <h3>{{ item.productName }}</h3>
+        <p>Product ID: {{ item.productId }}</p>
+        <p>
+          Quantity: {{item.quantity}}</p>
+        <p>Price per Unit: ₹{{ item.price }}</p>
+        <button (click) = "removeFromWishList(i)" class="remove-btn">Remove from Wishlist</button>
+        <button (click) = "addToCartFromWishList(item)" class="add-to-cart-btn">Add to Cart</button>
+      </div>
+    </div>
+
+    <div *ngIf="hasItemsInWishlist(); else emptyWishlist">
+      <p class="total-items">Total Items: {{ wishlist.length }}</p>
+    </div>
+  
+    <ng-template #emptyWishlist>
+      <div>
+        <h1>Your Wishlist is Empty!</h1>
+      </div>
+    </ng-template>
+
+    <div *ngIf="isModalVisible" class="modal-overlay">
+      <div class="modal-content">
+        <p>{{ message }}</p>
+        <button (click)="closeModal()">Close</button>
+      </div>
+    </div>
+</div>

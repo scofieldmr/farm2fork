@@ -1,0 +1,26 @@
+<div class="order-details-container">
+    <h2>Order Details</h2>
+    <table class="order-details-table">
+      <thead>
+        <tr>
+          <th>Order Detail ID</th>
+          <th>Order ID</th>
+          <th>Product ID</th>
+          <th>Quantity</th>
+          <th>Unit Price (₹)</th>
+          <th>Total Price (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orderHistory; let i = index" class="product-card">
+          <td>{{ order.orderDetailId }}</td>
+          <td>{{ order.orderId }}</td>
+          <td>{{ order.productId }}</td>
+          <td>{{ order.quantity }}</td>
+          <td>{{ order.unitPrice}}</td>
+          <td>{{ order.totalPrice}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  

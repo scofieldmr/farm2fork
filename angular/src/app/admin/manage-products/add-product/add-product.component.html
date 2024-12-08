@@ -1,0 +1,53 @@
+<div class="add-product">
+    <h1>Add Product</h1>
+    <form class="add-form" #addProductForm="ngForm" (ngSubmit)="addProduct(addProductForm.value)" novalidate>
+        <div class="form-group">
+            <label>Product ID</label>
+            <input type="text" name="prodId" ngModel required #prodId="ngModel">
+            <div *ngIf="prodId.invalid && prodId.touched" class="error-message">
+                Product ID is required.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" name="prodName" ngModel required minlength="3" #prodName="ngModel">
+            <div *ngIf="prodName.invalid && prodName.touched" class="error-message">
+                Product Name is required and must be at least 3 characters.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Product Category</label>
+            <input type="text" name="prodCategory" ngModel required #prodCategory="ngModel">
+            <div *ngIf="prodCategory.invalid && prodCategory.touched" class="error-message">
+                Product Category is required.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" name="prodQuantity" ngModel required min="1" #prodQuantity="ngModel">
+            <div *ngIf="prodQuantity.invalid && prodQuantity.touched" class="error-message">
+                Quantity must be at least 1.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Product Price</label>
+            <input type="number" name="prodPrice" ngModel required min="0" #prodPrice="ngModel">
+            <div *ngIf="prodPrice.invalid && prodPrice.touched" class="error-message">
+                Price must be added.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Add Product" [disabled]="addProductForm.invalid">
+        </div>
+    </form>
+
+    <div *ngIf="message" class="message" [ngClass]="{ 'success': isSuccess, 'error': !isSuccess }">
+        {{ message }}
+    </div>
+</div>
+

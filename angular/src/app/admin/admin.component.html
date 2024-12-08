@@ -1,0 +1,27 @@
+<nav class="navbar">
+  <div class="nav-brand">
+    <i class="fas fa-store"></i>
+    <span>Grocery Admin</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" (click)="goToManageProducts()">
+      <i class="fas fa-box"></i>
+      <span>Managing Products</span>
+    </a>
+    <a class="nav-link" (click)="goToManageUsers()">
+      <i class="fas fa-users"></i>
+      <span>Managing Customers</span>
+    </a>
+    <a class="nav-link" (click)="goToUpdateProfile()">
+      <i class="fas fa-user-cog"></i>
+      <span>Update Profile</span>      
+    </a>
+    <a class="nav-link" href="#" (click)="goTologout()">
+      <i class="fas fa-user-cog"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>
+  

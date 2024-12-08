@@ -1,0 +1,56 @@
+<div class="login-container">
+
+  <form (submit)="onSubmit($event)">
+    <h2 class="form-title">
+      <span class="welcome-text">Welcome to</span>
+      <div class="logo-container"></div>
+    </h2>
+    <p class="subtitle">Your daily fresh groceries await! 🛒</p>
+  
+    <div class="input-group">
+      <label for="email">Email:</label>
+      <input 
+        type="email" 
+        id="email" 
+        [(ngModel)]="email" 
+        name="email" 
+        required 
+        placeholder="Enter your email"
+        autocomplete="email">
+    </div>
+  
+    <div class="input-group">
+      <label for="password">Password:</label>
+      <input 
+        type="password" 
+        id="password" 
+        [(ngModel)]="password" 
+        name="password" 
+        required 
+        placeholder="Enter your password"
+        autocomplete="current-password">
+
+    </div>
+  
+
+    <button type="submit" [disabled]="deactivated">
+      <span>Login</span>
+    </button>
+  
+
+    <p *ngIf="errorMessage" [ngClass]="deactivated ? 'error' : 'success-message'">
+      {{ errorMessage }}
+    </p>
+  
+    <p *ngIf="deactivated" class="deactivated">
+      Your account has been deactivated.
+      <button type="button" (click)="reactivate()">Reactivate Account</button>
+    </p>
+
+    <div class="text-container">
+      <a routerLink="/register">New user? Register yourself</a>
+    </div>
+  </form>
+  
+  
+</div>

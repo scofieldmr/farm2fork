@@ -1,0 +1,55 @@
+<div class="add-customer-container">
+    <h2>Customer Registration</h2>
+    <form (ngSubmit)="addCustomer()" #customerForm="ngForm" novalidate>
+  
+     
+      <label>Customer Name:</label>
+      <input type="text" [(ngModel)]="customer.customerName" name="customerName" required pattern="^[A-Za-z ]+$" #customerName="ngModel">
+      <div *ngIf="customerName.invalid && customerName.touched" class="error">
+        <div *ngIf="customerName.errors?.['required']">Customer name is required.</div>
+        <div *ngIf="customerName.errors?.['pattern']">Please enter only alphabetic characters.</div>
+      </div>
+  
+      
+      <label>Email:</label>
+      <input type="email" [(ngModel)]="customer.email" name="email" required email #email="ngModel" (blur)="emailExists(customer.email)">
+      <div *ngIf="email.invalid && email.touched" class="error">
+        <div *ngIf="email.errors?.['required']">Email is required.</div>
+        <div *ngIf="email.errors?.['email']">Please enter a valid email address.</div>
+      </div>
+      <div *ngIf="emailExisting" class="error">This email is already registered.</div>
+  
+      
+      <label>Password:</label>
+      <input type="password" [(ngModel)]="customer.password" name="password" required minlength="6" #password="ngModel">
+      <div *ngIf="password.invalid && password.touched" class="error">
+        <div *ngIf="password.errors?.['required']">Password is required.</div>
+        <div *ngIf="password.errors?.['minlength']">Password must be at least 6 characters long.</div>
+      </div>
+  
+      
+      <label>Confirm Password:</label>
+      <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required #confirmPasswordField="ngModel" (input)="checkPasswords()">
+      <div *ngIf="confirmPasswordField.invalid && confirmPasswordField.touched" class="error">
+        Confirm password is required.
+      </div>
+      <div *ngIf="passwordMismatch && confirmPasswordField.touched" class="error">
+        Passwords do not match.
+      </div>
+  
+      
+      <label>Address:</label>
+      <input type="text" [(ngModel)]="customer.address" name="address" #address="ngModel">
+  
+      
+      <label>Contact Number:</label>
+      <input type="text" [(ngModel)]="customer.contactNumber" name="contactNumber" required pattern="^[0-9]{10}$" #contactNumber="ngModel">
+      <div *ngIf="contactNumber.invalid && contactNumber.touched" class="error">
+        <div *ngIf="contactNumber.errors?.['required']">Contact number is required.</div>
+        <div *ngIf="contactNumber.errors?.['pattern']">Contact number must be a 10-digit number.</div>
+      </div>
+  
+      <button type="submit" [disabled]="customerForm.invalid || passwordMismatch || emailExisting">Register</button>
+    </form>
+  </div>
+  

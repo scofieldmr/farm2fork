@@ -1,0 +1,51 @@
+<div id="displayAll">
+<h4>Profile</h4>
+  <button id="editButton" (click)="toggleEdit()">{{ editMode ? 'Cancel' : 'Edit' }}</button>
+  <form (ngSubmit)="saveChanges()" #profileForm="ngForm">
+    <table>
+      <tr>
+        <td>Name</td>
+        <td><input type="text" [(ngModel)]="customer.customerName" name="name" [readonly]="!editMode" #name="ngModel"
+          required></td>
+      </tr>
+      <div *ngIf="name.errors?.['required']" class="error">
+        Name is required
+      </div>
+      <tr>
+        <td>Email</td>
+        <td><input type="email" [(ngModel)]="customer.email" name="email" readonly></td>
+      </tr>
+      <tr>
+        <td>Contact no.</td>
+        <td><input type="text" [(ngModel)]="customer.contactNumber" name="contact" minlength="10" required  maxlength= "10" [readonly]="!editMode" #contact="ngModel"></td>
+      </tr>
+      <div *ngIf="contact.errors?.['required']" class="error">
+        Contact is required
+      </div>
+      <div *ngIf="contact.errors?.['minlength']" class="error">
+        Contact Must be 10 digit number
+      </div>
+      <div *ngIf="contact.errors?.['maxlength']" class="error">
+        Contact Must be 10 digit number
+      </div>
+      <tr>
+        <td>Address</td>
+        <td><input type="text" [(ngModel)]="customer.address" name="address" required [readonly]="!editMode" #address="ngModel"
+          ></td>
+      </tr>
+      <div *ngIf="address.errors?.['required']" class="error">
+        Address is required
+      </div>
+      <tr>
+        <td colspan="1" style="text-align: center;">
+          <button type="submit" *ngIf="editMode" id="saveButton"
+          [disabled]="name.invalid || address.invalid || contact.invalid"
+           (click) = updateDetails(customer)>Save Changes</button>
+        </td>
+        <td colspan="1" style="text-align: center;">
+            <button type="submit" id="deactivateButton" (click) = deactivateAccount(customer.customerId)>Deactivate</button>
+          </td>
+      </tr>
+    </table>
+  </form>
+</div>
