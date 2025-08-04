@@ -15,7 +15,7 @@ public interface ProductRepository extends JpaRepository<Products, Long> {
 
     Optional<Products> findProductsByProductIdAndProductName(Long productId, @NotBlank(message = "Product Name is Required.") String productName);
 
-    Products findProductsByProductName(String productName);
+    Optional<Products> findProductsByProductName(String productName);
 
     List<Products> findAllByOrderByPriceAsc();
 

@@ -1,5 +1,6 @@
 package com.grocery.productservice.service;
 
+import com.grocery.productservice.dto.ProductPageResponse;
 import com.grocery.productservice.dto.ProductResponseDto;
 import com.grocery.productservice.dto.ProductSaveDto;
 import com.grocery.productservice.dto.ProductUpdateDto;
@@ -39,5 +40,9 @@ public interface ProductService {
     List<ProductResponseDto> sortProductsByBrandByPrice(String brand,String orderBy);
 
     ProductResponseDto getProductByProductName(String productName);
+
+    ProductPageResponse getProductsWithPage(Integer pageNumber, Integer pageSize);
+
+    ProductPageResponse getProductsWithPageAndSort(Integer pageNumber, Integer pageSize, String sortBy,String direction);
 
 }

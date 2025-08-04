@@ -1,5 +1,6 @@
 package com.grocery.productservice.service;
 
+import com.grocery.productservice.dto.ProductPageResponse;
 import com.grocery.productservice.dto.ProductResponseDto;
 import com.grocery.productservice.dto.ProductSaveDto;
 import com.grocery.productservice.dto.ProductUpdateDto;
@@ -11,6 +12,10 @@ import com.grocery.productservice.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,7 +53,7 @@ public class ProductServiceImp implements ProductService {
     @Override
     public ProductResponseDto addProduct(ProductSaveDto productSaveDto) {
 
-        Products getproducts = productRepository
+        Optional<Products> getproducts = productRepository
                 .findProductsByProductName(productSaveDto.getProductName());
 
         if (getproducts != null) {
@@ -273,14 +278,47 @@ public class ProductServiceImp implements ProductService {
 
         logger.info("Getting the product by product name", productName);
 
-        logger.info("Product List {}", productRepository.findProductsByProductName(productName).toString());
+        Products productsByProductName = productRepository.findProductsByProductName(productName)
+                .orElseThrow(()-> new ProductNotFoundException("Product not found with name: " + productName));
 
-        Products productsByProductName = productRepository.findProductsByProductName(productName);
-
-
-        if (productsByProductName == null) {
-            throw new ProductNotFoundException("Product not found with name: " + productName);
-        }
         return productMapper.productToProductResponseDto(productsByProductName);
+    }
+
+    @Override
+    public ProductPageResponse getProductsWithPage(Integer pageNumber, Integer pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        Page<Products> productsPage = productRepository.findAll(pageable);
+        List<Products> productsList = productsPage.getContent();
+
+        List<ProductResponseDto> productResponseDtos = new ArrayList<>();
+        for(Products products : productsList) {
+            ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+            productResponseDtos.add(responseDto);
+        }
+
+        return new ProductPageResponse(productResponseDtos,pageNumber,pageSize,
+                productsPage.getTotalElements(),productsPage.getTotalPages(),productsPage.isLast());
+    }
+
+    @Override
+    public ProductPageResponse getProductsWithPageAndSort(Integer pageNumber, Integer pageSize, String sortBy, String direction) {
+
+        Sort sort = direction.equalsIgnoreCase("ASC")? Sort.by(sortBy).ascending(): Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+
+        Page<Products> productsPage = productRepository.findAll(pageable);
+        List<Products> productsList = productsPage.getContent();
+
+        List<ProductResponseDto> productResponseDtos = new ArrayList<>();
+        for(Products products : productsList) {
+            ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+            productResponseDtos.add(responseDto);
+        }
+
+        return new ProductPageResponse(productResponseDtos,pageNumber,pageSize,
+                productsPage.getTotalElements(),productsPage.getTotalPages(),productsPage.isLast());
     }
 }

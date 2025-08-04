@@ -1,9 +1,11 @@
 package com.grocery.productservice.controller;
 
+import com.grocery.productservice.dto.ProductPageResponse;
 import com.grocery.productservice.dto.ProductResponseDto;
 import com.grocery.productservice.dto.ProductSaveDto;
 import com.grocery.productservice.dto.ProductUpdateDto;
 import com.grocery.productservice.service.ProductService;
+import com.grocery.productservice.utils.AppConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
@@ -145,6 +148,28 @@ public class ProductController {
     public ResponseEntity<?> getProductByName(@PathVariable("product_name") String productName){
         ProductResponseDto productResponseDto = productService.getProductByProductName(productName);
         return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/allProductsWithPage")
+    public ResponseEntity<?> getAllProductsWithPage(
+            @RequestParam(defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+    ) {
+        ProductPageResponse ProductPageResponseList = productService.getProductsWithPage(pageNumber, pageSize);
+        return new ResponseEntity<>(ProductPageResponseList, HttpStatus.OK);
+    }
+
+    //Pagination and Sorting
+    @GetMapping("/allProductsWithPageAndSort")
+    public ResponseEntity<?> getAllProductsWithPageAndSort(
+            @RequestParam(defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(defaultValue = AppConstants.SORT_BY,required = false) String sortBy,
+            @RequestParam(defaultValue = AppConstants.SORT_DIR,required = false) String direction
+
+    ) {
+        ProductPageResponse ProductPageResponseListWithSort = productService.getProductsWithPageAndSort(pageNumber, pageSize, sortBy, direction);
+        return new ResponseEntity<>(ProductPageResponseListWithSort, HttpStatus.OK);
     }
 
 
