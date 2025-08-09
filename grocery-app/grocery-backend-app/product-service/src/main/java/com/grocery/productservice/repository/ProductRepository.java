@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Products, Long> {
 
-    Optional<Products> findProductsByProductIdAndProductName(Long productId, @NotBlank(message = "Product Name is Required.") String productName);
+    Optional<Products> findProductsByIdAndProductName(Long productId, @NotBlank(message = "Product Name is Required.") String productName);
 
     Optional<Products> findProductsByProductName(String productName);
 

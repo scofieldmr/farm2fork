@@ -4,6 +4,7 @@ import com.grocery.productservice.dto.ProductPageResponse;
 import com.grocery.productservice.dto.ProductResponseDto;
 import com.grocery.productservice.dto.ProductSaveDto;
 import com.grocery.productservice.dto.ProductUpdateDto;
+import com.grocery.productservice.exception.InvalidSortException;
 import com.grocery.productservice.exception.ProductAlreadyExistsException;
 import com.grocery.productservice.exception.ProductNotFoundException;
 import com.grocery.productservice.mapper.ProductMapper;
@@ -12,12 +13,20 @@ import com.grocery.productservice.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,11 +36,20 @@ public class ProductServiceImp implements ProductService {
 
     private static Logger logger = LoggerFactory.getLogger(ProductServiceImp.class);
 
+    @Value("${project.poster}")
+    private String path;
+
+    @Value("${base.url}")
+    private String baseUrl;
+
+    private final FileService fileService;
+
     private final ProductRepository productRepository;
 
     private final ProductMapper productMapper;
 
-    public ProductServiceImp(ProductRepository productRepository, ProductMapper productMapper) {
+    public ProductServiceImp(FileService fileService, ProductRepository productRepository, ProductMapper productMapper) {
+        this.fileService = fileService;
         this.productRepository = productRepository;
         this.productMapper = productMapper;
     }
@@ -43,7 +61,10 @@ public class ProductServiceImp implements ProductService {
         List<ProductResponseDto> productResponseDtos = new ArrayList<>();
 
         for (Products products : allProducts) {
+            String productImageUrl = baseUrl+"/api/v1/file/"+products.getProductPoster();
             ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+            responseDto.setProductImageUrl(productImageUrl);
+
             productResponseDtos.add(responseDto);
         }
 
@@ -51,53 +72,108 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public ProductResponseDto addProduct(ProductSaveDto productSaveDto) {
+    @Transactional
+    public ProductResponseDto addProduct(ProductSaveDto productSaveDto,
+                                         MultipartFile file) throws IOException {
+
+        if(Files.exists(Paths.get(path+ File.separator + file.getOriginalFilename()))){
+            throw new FileAlreadyExistsException("File already exists..Please try another filename..");
+        }
 
         Optional<Products> getproducts = productRepository
                 .findProductsByProductName(productSaveDto.getProductName());
 
-        if (getproducts != null) {
-           throw new ProductAlreadyExistsException("Product already exists with name " + productSaveDto.getProductName());
+        if (getproducts.isPresent()) {
+            throw new ProductAlreadyExistsException("Product already exists with name " + productSaveDto.getProductName());
         }
+
+        //Upload the file
+        String uploadedFileName = fileService.uploadFile(path,file);
+
+        //Set the poster name
+        productSaveDto.setProductPoster(uploadedFileName);
+
+        //Map the productSaveDto to produt
         Products products = productMapper.productSaveDtoToProducts(productSaveDto);
 
+        //Then save the product
         Products savedProduct = productRepository.save(products);
 
-        return productMapper.productToProductResponseDto(savedProduct);
+        //generat the posterurl
+        String productImageUrl = baseUrl+"/api/v1/file/"+uploadedFileName;
+
+        //Map the product to productResponseDto
+        ProductResponseDto savedResponseDto = productMapper.productToProductResponseDto(savedProduct);
+
+        //Set the posterUrl
+        savedResponseDto.setProductImageUrl(productImageUrl);
+
+        return savedResponseDto;
 
     }
 
     @Override
     public ProductResponseDto getProductById(Long productId) {
         Products getProductById = productRepository.findById(productId)
-                .orElseThrow(()-> new ProductNotFoundException("Product not found with id: " + productId));
+                .orElseThrow(()-> new ProductNotFoundException("Product Not Found with ID: " + productId));
 
-        return productMapper.productToProductResponseDto(getProductById);
+        String productImageUrl = baseUrl+"/api/v1/file/"+getProductById.getProductPoster();
+
+        ProductResponseDto productResponseDto = productMapper.productToProductResponseDto(getProductById);
+        productResponseDto.setProductImageUrl(productImageUrl);
+
+        return productResponseDto;
     }
 
     @Override
     @Transactional
-    public ProductResponseDto updateProduct(Long productId, ProductUpdateDto productUpdateDto) {
-        Products product = productRepository.findProductsByProductIdAndProductName(productId,productUpdateDto.getProductName())
+    public ProductResponseDto updateProduct(Long productId,
+                                            ProductUpdateDto productUpdateDto,
+                                            MultipartFile file) throws IOException {
+        // 1. check if movie object exists with given movieId
+        Products product = productRepository.findProductsByIdAndProductName(productId,productUpdateDto.getProductName())
                         .orElseThrow(()-> new ProductNotFoundException("Product not found with id: " + productId +" and name: " + productUpdateDto.getProductName()));
 
+        //Get fileName
+        String fileName = product.getProductPoster();
+        if(file!=null){
+            Files.deleteIfExists(Paths.get(path+ File.separator + fileName));
+            fileName = fileService.uploadFile(path,file);
+        }
+
+        //Set the poster value
+        logger.info("filename {}", fileName);
+        product.setProductPoster(fileName);
+
+        //Save the uploaded file
         product.setProductCategory(productUpdateDto.getProductCategory());
+        product.setProductDescription(productUpdateDto.getProductDescription());
         product.setPrice(productUpdateDto.getPrice());
         product.setBrandName(productUpdateDto.getBrandName());
-        product.setProductImageUrl(productUpdateDto.getProductImageUrl());
 
+        //Save the updated movie
         Products updatedProduct = productRepository.save(product);
+        String productImageUrl = baseUrl+"/api/v1/file/"+fileName;
 
-        return productMapper.productToProductResponseDto(updatedProduct);
+        //Response dto
+        ProductResponseDto updatedResponseDto = productMapper.productToProductResponseDto(updatedProduct);
+        updatedResponseDto.setProductImageUrl(productImageUrl);
+
+
+        return updatedResponseDto;
     }
 
 
     @Override
-    public void deleteProductById(Long productId) {
+    public void deleteProductById(Long productId) throws IOException {
 
         Products products = productRepository.findById(productId)
                 .orElseThrow(()-> new ProductNotFoundException("Product not found with id: " + productId));
 
+        //delete the poster
+        Files.deleteIfExists(Paths.get(path+ File.separator+products.getProductPoster()));
+
+        //delete from DB
         productRepository.delete(products);
     }
 
@@ -110,7 +186,9 @@ public class ProductServiceImp implements ProductService {
             List<ProductResponseDto> productResponseDtosByAsc = new ArrayList<>();
 
             for(Products products : sortProducts) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByAsc.add(responseDto);
             }
 
@@ -122,7 +200,9 @@ public class ProductServiceImp implements ProductService {
             List<ProductResponseDto> productResponseDtosByDesc = new ArrayList<>();
 
             for(Products products : sortProducts) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByDesc.add(responseDto);
             }
 
@@ -138,7 +218,9 @@ public class ProductServiceImp implements ProductService {
         List<Products> productsByCategory = productRepository.findAllByProductCategory(category);
         List<ProductResponseDto> productResponseByCategoryList = new ArrayList<>();
         for (Products products : productsByCategory) {
+            String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
             ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+            responseDto.setProductImageUrl(productImageUrl);
             productResponseByCategoryList.add(responseDto);
         }
         return productResponseByCategoryList;
@@ -159,7 +241,9 @@ public class ProductServiceImp implements ProductService {
             List<Products> sortProductsByCategory = productRepository.findAllByOrderByProductCategory();
             List<ProductResponseDto> productResponseDtosByAsc = new ArrayList<>();
             for(Products products : sortProductsByCategory) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByAsc.add(responseDto);
             }
             return productResponseDtosByAsc;
@@ -168,13 +252,15 @@ public class ProductServiceImp implements ProductService {
             List<Products> sortProductsByCategoryDesc = productRepository.findAllByOrderByProductCategoryDesc();
             List<ProductResponseDto> productResponseDtosByDesc = new ArrayList<>();
             for(Products products : sortProductsByCategoryDesc) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByDesc.add(responseDto);
             }
             return productResponseDtosByDesc;
         }
         else {
-            throw new RuntimeException("Invalid sort order");
+            throw new InvalidSortException("Invalid sort order");
         }
     }
 
@@ -184,7 +270,9 @@ public class ProductServiceImp implements ProductService {
             List<Products> sortProductsByCategory = productRepository.findAllByOrderByProductCategoryAscByPriceAsc(category);
             List<ProductResponseDto> productResponseDtosByAsc = new ArrayList<>();
             for(Products products : sortProductsByCategory) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByAsc.add(responseDto);
             }
             return productResponseDtosByAsc;
@@ -193,13 +281,15 @@ public class ProductServiceImp implements ProductService {
             List<Products> sortProductsByCategoryDesc = productRepository.findAllByOrderByProductCategoryDescByPriceDesc(category);
             List<ProductResponseDto> productResponseDtosByDesc = new ArrayList<>();
             for(Products products : sortProductsByCategoryDesc) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByDesc.add(responseDto);
             }
             return productResponseDtosByDesc;
         }
         else {
-            throw new RuntimeException("Invalid sort order");
+            throw new InvalidSortException("Invalid sort order");
         }
     }
 
@@ -215,7 +305,9 @@ public class ProductServiceImp implements ProductService {
         List<Products> productsListByBrand = productRepository.findAllByProductCategory(brand);
         List<ProductResponseDto> productResponseDtosByBrand = new ArrayList<>();
         for (Products products : productsListByBrand) {
+            String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
             ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+            responseDto.setProductImageUrl(productImageUrl);
             productResponseDtosByBrand.add(responseDto);
         }
         return productResponseDtosByBrand;
@@ -227,7 +319,9 @@ public class ProductServiceImp implements ProductService {
             List<Products> sortProductsListByBrand = productRepository.findAllByOrderByBrandNameAsc();
             List<ProductResponseDto> productResponseDtosByAsc = new ArrayList<>();
             for(Products products : sortProductsListByBrand) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByAsc.add(responseDto);
             }
             return productResponseDtosByAsc;
@@ -236,13 +330,15 @@ public class ProductServiceImp implements ProductService {
             List<Products> sortProductsListByBrandDesc = productRepository.findAllByOrderByBrandNameDesc();
             List<ProductResponseDto> productResponseDtosByDesc = new ArrayList<>();
             for(Products products : sortProductsListByBrandDesc) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByDesc.add(responseDto);
             }
             return productResponseDtosByDesc;
         }
         else{
-            throw new RuntimeException("Invalid sort order");
+            throw new InvalidSortException("Invalid sort order");
         }
     }
 
@@ -253,7 +349,9 @@ public class ProductServiceImp implements ProductService {
             List<Products> sortProductsListByBrand = productRepository.findAllByOrderByBrandNameAscByPriceAsc(brand);
             List<ProductResponseDto> productResponseDtosByAsc = new ArrayList<>();
             for(Products products : sortProductsListByBrand) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByAsc.add(responseDto);
             }
             return productResponseDtosByAsc;
@@ -262,13 +360,15 @@ public class ProductServiceImp implements ProductService {
             List<Products> sortProductsListByBrandDesc = productRepository.findAllByOrderByBrandNameDescByPriceDesc(brand);
             List<ProductResponseDto> productResponseDtosByDesc = new ArrayList<>();
             for(Products products : sortProductsListByBrandDesc) {
+                String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
                 ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+                responseDto.setProductImageUrl(productImageUrl);
                 productResponseDtosByDesc.add(responseDto);
             }
             return productResponseDtosByDesc;
         }
         else{
-            throw new RuntimeException("Invalid sort order");
+            throw new InvalidSortException("Invalid sort order");
         }
     }
 
@@ -281,7 +381,12 @@ public class ProductServiceImp implements ProductService {
         Products productsByProductName = productRepository.findProductsByProductName(productName)
                 .orElseThrow(()-> new ProductNotFoundException("Product not found with name: " + productName));
 
-        return productMapper.productToProductResponseDto(productsByProductName);
+        String productImageUrl = baseUrl + "/api/v1/file/" + productsByProductName.getProductPoster();
+
+        ProductResponseDto responseDto = productMapper.productToProductResponseDto(productsByProductName);
+        responseDto.setProductImageUrl(productImageUrl);
+
+        return responseDto;
     }
 
     @Override
@@ -295,6 +400,8 @@ public class ProductServiceImp implements ProductService {
         List<ProductResponseDto> productResponseDtos = new ArrayList<>();
         for(Products products : productsList) {
             ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+            String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
+            responseDto.setProductImageUrl(productImageUrl);
             productResponseDtos.add(responseDto);
         }
 
@@ -315,6 +422,8 @@ public class ProductServiceImp implements ProductService {
         List<ProductResponseDto> productResponseDtos = new ArrayList<>();
         for(Products products : productsList) {
             ProductResponseDto responseDto = productMapper.productToProductResponseDto(products);
+            String productImageUrl = baseUrl + "/api/v1/file/"+products.getProductPoster();
+            responseDto.setProductImageUrl(productImageUrl);
             productResponseDtos.add(responseDto);
         }
 
