@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { getAllProducts } from '../../services/ProductService';
 import '../../css/productlist.css';
 import { useNavigate } from 'react-router-dom';
+import { addToWishlist, fetchWishlistByUser } from '../../services/WishlistService';
 
 const ProductList = () => {
 
@@ -22,6 +23,26 @@ const ProductList = () => {
     useEffect(() => {
         getAllProductDetails()
     }, []);
+
+    //Adding Product in the Wishlist
+
+    const userId = 1;
+
+    function addWishlistItem(productId){
+    const wishlist = {
+        userId: 1,
+        productId: productId
+     };
+        addToWishlist(wishlist)
+          .then((response) => {
+             alert("Product Added to the Wishlist");
+             navigator("/");
+          })
+          .catch((error)=> {
+            alert("Error adding the product in the Wishlist");
+            console.error(error);
+          })
+     }
 
     // useEffect(() => {
     //     setProducts([
@@ -86,6 +107,8 @@ const ProductList = () => {
                                         </button>
                                         <button
                                             className="btn btn-outline-danger"
+                                            onClick={() => addWishlistItem(product.productId)}
+
                                         >
                                             Wishlist
                                         </button>
